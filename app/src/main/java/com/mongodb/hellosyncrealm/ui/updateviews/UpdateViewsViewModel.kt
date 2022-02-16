@@ -8,6 +8,7 @@ import io.realm.mongodb.Credentials
 import io.realm.mongodb.SyncConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UpdateViewsViewModel(private val realmApp: App) : ViewModel() {
 
@@ -32,16 +33,20 @@ class UpdateViewsViewModel(private val realmApp: App) : ViewModel() {
             ).build()
 
             val realm = Realm.open(syncCong)
-            realm.write {
-                var visitInfo = query(VisitInfo::class).first().find()
-                if (visitInfo != null) {
-                    visitInfo.visitCount = count
-                } else {
-                    visitInfo = VisitInfo().apply {
+            val updated = realm.write {
+                val visitInfo = query(VisitInfo::class).first().find()
+                val info = visitInfo?.apply {
+                    visitCount += count
+                }
+                    ?: VisitInfo().apply {
                         visitCount = count
                         _id = user.identity
                     }
-                }
+                copyToRealm(info)
+            }
+
+            withContext(Dispatchers.Main) {
+                _visitInfo.value = updated
             }
         }
     }

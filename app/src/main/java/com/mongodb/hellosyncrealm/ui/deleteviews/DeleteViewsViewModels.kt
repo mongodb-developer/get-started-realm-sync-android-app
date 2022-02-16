@@ -34,7 +34,7 @@ class DeleteViewsViewModels(private val realmApp: App) : ViewModel() {
             val realm = Realm.open(config)
             val visitInfo = realm.write {
                 val info = query<VisitInfo>().first().find()
-                return@write info?.apply {
+                val updated = info?.apply {
                     visitCount = if (info.visitCount.minus(count) >= 0)
                         info.visitCount.minus(count)
                     else
@@ -42,7 +42,9 @@ class DeleteViewsViewModels(private val realmApp: App) : ViewModel() {
                 } ?: VisitInfo().apply {
                     _id = user.identity
                 }
+                copyToRealm(updated)
             }
+
 
             withContext(Dispatchers.Main) {
                 _visitInfo.value = visitInfo
