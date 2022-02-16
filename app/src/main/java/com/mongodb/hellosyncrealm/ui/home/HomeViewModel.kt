@@ -44,16 +44,17 @@ class HomeViewModel(private val realmApp: App) : ViewModel() {
             val realm = Realm.open(configuration = config)
             realm.write {
                 val visitInfo = this.query<VisitInfo>().first().find()
-                visitInfo?.updateCount() ?: VisitInfo().apply {
-                    partition = user.identity
-                }.updateCount()
+                copyToRealm(visitInfo?.updateCount()
+                    ?: VisitInfo().apply {
+                        partition = user.identity
+                        visitCount = 1
+                    })
             }
             _isLoading.postValue(false)
         }
     }
 
     fun onRefreshCount(): Flow<VisitInfo?> {
-        _isLoading.value = true
 
         val user = runBlocking { realmApp.login(Credentials.anonymous()) }
         val config = SyncConfiguration.Builder(
