@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.mongodb.hellosyncrealm.HelloRealmSyncApp
 import com.mongodb.hellosyncrealm.R
 import com.mongodb.hellosyncrealm.databinding.FragmentDeleteViewsBinding
 import com.mongodb.hellosyncrealm.hideKeyboard
@@ -19,8 +18,7 @@ class DeleteViewsFragment : Fragment() {
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                val realmApp = (requireActivity().application as HelloRealmSyncApp).realmSync
-                return DeleteViewsViewModels(realmApp) as T
+                return DeleteViewsViewModels() as T
             }
         }
     }

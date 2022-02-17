@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navGraphViewModels
-import com.mongodb.hellosyncrealm.HelloRealmSyncApp
 import com.mongodb.hellosyncrealm.R
+import com.mongodb.hellosyncrealm.RealmDatabase
 import com.mongodb.hellosyncrealm.databinding.FragmentHomeBinding
+import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment() {
@@ -22,8 +23,7 @@ class HomeFragment : Fragment() {
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                    val realmApp = (requireActivity().application as HelloRealmSyncApp).realmSync
-                    return HomeViewModel(realmApp) as T
+                    return HomeViewModel() as T
                 }
             }
         })
@@ -46,24 +46,20 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            homeViewModel.visitInfoCount.collect {
+                binding.textHomeSubtitle.text = "You have visited this page $it times"
+            }
         }
 
-        homeViewModel.visitInfo.observe(viewLifecycleOwner) {
-            binding.textHomeSubtitle.text = "You have visited this page $it times"
-        }
-
-        binding.btRefreshCount.setOnClickListener {
-            homeViewModel.onRefreshCount()
-        }
-
-        homeViewModel.isLoading.observe(viewLifecycleOwner) {
-            binding.pgLoading.visibility = if (it) {
-                View.VISIBLE
-            } else {
-                View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            RealmDatabase.isSyncReady.collect { isSyncReady ->
+                if (isSyncReady) {
+                    homeViewModel.start()
+                    binding.pgLoading.visibility = View.GONE
+                } else {
+                    binding.pgLoading.visibility = View.VISIBLE
+                }
             }
         }
     }
