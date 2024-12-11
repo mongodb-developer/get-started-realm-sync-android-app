@@ -47,13 +47,13 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, {
+        homeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
-        })
+        }
 
-        homeViewModel.visitInfo.observe(viewLifecycleOwner, {
+        homeViewModel.visitInfo.observe(viewLifecycleOwner) {
             binding.textHomeSubtitle.text = "You have visited this page $it times"
-        })
+        }
 
         binding.btRefreshCount.setOnClickListener {
             homeViewModel.onRefreshCount()

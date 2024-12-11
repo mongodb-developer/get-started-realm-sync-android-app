@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'realm-android'
+    id("io.realm.kotlin") version "0.9.0"
 }
 
 android {
@@ -23,11 +23,11 @@ android {
 
         debug {
             minifyEnabled false
-            buildConfigField "String", "RealmAppId", "\"realmsyncapp-esrkv\""
+            buildConfigField "String", "RealmAppId", "\"application-0-liuqs\""
         }
 
         release {
-            buildConfigField "String", "RealmAppId", "\"realmsyncapp-esrkv\""
+            buildConfigField "String", "RealmAppId", "\"application-0-liuqs\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -46,9 +46,10 @@ android {
         viewBinding true
     }
 
-    realm {
-        syncEnabled = true
+    packagingOptions{
+        exclude 'META-INF/io.realm.kotlin.library.kotlin_module'
     }
+
 }
 
 dependencies {
@@ -61,6 +62,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.4'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.4'
+
+    implementation("io.realm.kotlin:library-sync:0.9.0")
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
